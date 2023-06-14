@@ -19,18 +19,30 @@ app.get('/', (req, res) => {
   res.json({result: "success"})
 })
 
-app.get('/player', (req, res) => {
-    const { attributeName, attributeValue } = req.query; // 프론트에서 선택한 어트리뷰트 이름과 값 받아옵니다.
+app.get('/players', (req, res) => {
+    const { attributeName, attributeValue } = req.query; // 프론트에서 선택한 어트리뷰트 이름과 값을 받아옵니다.
   
     let sql = '';
     if (attributeName === 'name') {
-      sql = `SELECT * FROM player WHERE player_name = '${attributeValue}'`;
+      sql = `SELECT players.player_name, players.*, teams.image
+      FROM players
+      INNER JOIN teams ON players.team_id = teams.team_id
+      WHERE players.player_name LIKE '%${attributeValue}%'`;
     } else if (attributeName === 'back_number') {
-      sql = `SELECT * FROM player WHERE player_number = ${attributeValue}`;
+      sql = `SELECT players.*, teams.image
+            FROM players
+            INNER JOIN teams ON players.team_id = teams.team_id
+            WHERE players.player_number = '${attributeValue}'`;
     } else if (attributeName === 'position') {
-      sql = `SELECT * FROM player WHERE position = '${attributeValue}'`;
+            sql = `SELECT players.*, teams.image
+            FROM players
+            INNER JOIN teams ON players.team_id = teams.team_id
+            WHERE players.player_position = '${attributeValue}'`;
     } else if (attributeName === 'team') {
-      sql = `SELECT * FROM player WHERE team = '${attributeValue}'`;
+            sql = `SELECT players.*, teams.image
+            FROM players
+            INNER JOIN teams ON players.team_id = teams.team_id
+            WHERE players.player_name = '${attributeValue}'`;
     } else {
       res.json({ result: 'error', message: 'Invalid attribute name' });
       return;
@@ -49,11 +61,10 @@ app.get('/player', (req, res) => {
 app.get('/stats', (req, res) => {
     const { attributeValue } = req.query; // 프론트에서 선택한 어트리뷰트 값 받아옵니다.
 
-    const sql = `SELECT * FROM stats
-                WHERE player_id = (
-                  SELECT id FROM player
-                  WHERE player_name = '${attributeValue}'
-                )`;
+    const sql = `SELECT players.player_name, player_stats.*
+                FROM player_stats
+                INNER JOIN players ON player_stats.player_id = players.player_id
+                WHERE players.player_name LIKE '%${attributeValue}%'`;
   
     db.query(sql, (err, rows) => {
       if (err) {
@@ -64,16 +75,16 @@ app.get('/stats', (req, res) => {
     });
 })
 
-app.get('/team', (req, res) => {
+app.get('/teams', (req, res) => {
     const { attributeName, attributeValue } = req.query; // 프론트에서 선택한 어트리뷰트 이름과 값 받아옵니다.
   
     let sql = '';
     if (attributeName === 'team_name') {
-      sql = `SELECT * FROM player WHERE player_name = '${attributeValue}'`;
+      sql = `SELECT * FROM teams WHERE team_name LIKE '%${attributeValue}%'`;
     } else if (attributeName === 'city') {
-      sql = `SELECT * FROM player WHERE player_number = ${attributeValue}`;
+      sql = `SELECT * FROM teams WHERE team_city = ${attributeValue}`;
     } else if (attributeName === 'abbreviation') {
-      sql = `SELECT * FROM player WHERE position = '${attributeValue}'`;
+      sql = `SELECT * FROM teams WHERE team_abbreviation = '${attributeValue}'`;
     } else {
       res.json({ result: 'error', message: 'Invalid attribute name' });
       return;
