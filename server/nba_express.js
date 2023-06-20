@@ -47,19 +47,17 @@ app.get('/players', (req, res) => {
       FROM players
       INNER JOIN teams ON players.team_id = teams.team_id
       WHERE players.player_name LIKE '%${attributeValue}%'
-      ORDER BY players.${attributeName} ASC`;
+      ORDER BY players.player_name ASC`;
     } else if (attributeName === 'player_position') {
         sql = `SELECT players.*, teams.image
         FROM players
         INNER JOIN teams ON players.team_id = teams.team_id
-        WHERE players.player_position = '${attributeValue}'
-        ORDER BY players.player_name ASC`;
-    } else if (attributeName === 'team') {
+        WHERE players.player_position = '${attributeValue}'`;
+    } else if (attributeName === 'player_team') {
         sql = `SELECT players.*, teams.team_name, teams.image
         FROM players
         INNER JOIN teams ON players.team_id = teams.team_id
-        WHERE teams.team_name LIKE '%${attributeValue}%'
-        ORDER BY players.player_name ASC`;
+        WHERE teams.team_name LIKE '%${attributeValue}%'`;
     } else {
       res.json({ result: 'error', message: 'Invalid attribute name' });
       return;
@@ -75,7 +73,7 @@ app.get('/players', (req, res) => {
   });
   
 
-app.get('/stats', (req, res) => {
+app.get('/player_stats', (req, res) => {
     const { attributeName, attributeValue } = req.query; // 프론트에서 선택한 어트리뷰트 값 받아옵니다.
 
     const sql = `SELECT players.player_name, player_stats.*
