@@ -52,12 +52,14 @@ app.get('/players', (req, res) => {
         sql = `SELECT players.*, teams.image
         FROM players
         INNER JOIN teams ON players.team_id = teams.team_id
-        WHERE players.player_position = '${attributeValue}'`;
+        WHERE players.player_position = '${attributeValue}'
+        ORDER BY players.player_name ASC`;
     } else if (attributeName === 'player_team') {
         sql = `SELECT players.*, teams.team_name, teams.image
         FROM players
         INNER JOIN teams ON players.team_id = teams.team_id
-        WHERE teams.team_name LIKE '%${attributeValue}%'`;
+        WHERE teams.team_name LIKE '%${attributeValue}%'
+        ORDER BY players.player_name ASC`;
     } else {
       res.json({ result: 'error', message: 'Invalid attribute name' });
       return;
